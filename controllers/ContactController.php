@@ -4,17 +4,31 @@ class ContactController
 {
     public function index(){ 
         $Contact= new Contact();
-        $Contact->findAll();
+        $listeContacts= $Contact->findAll();
 
         header("content-type: application/json");
         http_response_code(200);
-        echo json_encode(["message" => "GET contact success", "data" => $Contact->findAll()]);
+        echo json_encode([
+            "message" => "GET contact success", "Total de contacts"=> count($listeContacts) ,"Contacts" => $listeContacts]);
     }
 
 
 
     public function show($id)
-    {
+    {   $id=(int)$id;
+        if (!is_numeric($id)|| !is_int($id)) { //Toujours vérifier si l'Id deemandé est bien numérique et entier
+            http_response_code(400); // Mauvaise requête (Bad Request)
+            echo json_encode(['error' => 'ID invalide, valeur numérique entière requise']);
+            exit;
+        }
+        
+
+        if (!($id>=1)) { //Vérifier si l'Id deemandé n'est pas négatif et à minima égal à 1
+            http_response_code(400); // Mauvaise requête (Bad Request)
+            echo json_encode(['error' => 'ID invalide, ID valeur inférieure à 1']);
+            exit;
+        }
+
         $contact= new Contact();
         $contactbyId = $contact->findById($id);
         
@@ -43,6 +57,12 @@ class ContactController
             http_response_code(400);
             echo json_encode(["error" => "Données incomplètes ou invalides"]);
             return;
+        }
+
+        if (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)){
+            http_response_code(400);
+            echo json_encode(['error'=> 'email non valide ']);
+            exit;
         }
 
         $contact = new Contact();
