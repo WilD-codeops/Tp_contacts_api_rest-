@@ -59,12 +59,6 @@ class ContactController
             return;
         }
 
-        if (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)){
-            http_response_code(400);
-            echo json_encode(['error'=> 'email non valide ']);
-            exit;
-        }
-
         $contact = new Contact();
 
         try {
